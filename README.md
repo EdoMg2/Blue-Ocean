@@ -20,7 +20,7 @@ Blue Ocean is a sophisticated marine monitoring buoy designed to provide real-ti
 ## Installation & Setup
 1. **Clone the repository**
    ```sh
-   git clone https://github.com/guolfie/blue-ocean.git
+   git clone https://github.com/EdoMg2/blue-ocean.git
 2. **Install Node.js dependencies**
 
 Copy code
