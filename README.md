@@ -21,7 +21,7 @@ Blue Ocean is a sophisticated marine monitoring buoy designed to provide real-ti
 1. **Clone the repository**
    ```sh
    git clone https://github.com/guolfie/blue-ocean.git
-2. Install Node.js dependencies
+2. **Install Node.js dependencies**
 
 Copy code
 npm install
@@ -29,23 +29,23 @@ npm install
 
 Create a new database named blue_ocean.
 Import the provided SQL schema.
-3. Configure Python environment
+3. **Configure Python environment**
 
-4. Ensure Python is installed and set up the required libraries.
+4. **Ensure Python is installed and set up the required libraries**
 Arduino Setup
 
 Load the provided Arduino script to the microcontroller.
-##Usage
+## Usage
 Run the Node.js server.
 Access the web interface through a browser.
 Data from the buoy will be displayed in real-time.
 ##Contributing
 Contributions are welcome! Please read our contributing guidelines for details.
 
-##Author
+## Author
 Eduardo Mendoza - Initial Work - @guolfie
 License
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
-##Acknowledgements
+## Acknowledgements
 Special thanks to all contributors and supporters of the Blue Ocean project.
