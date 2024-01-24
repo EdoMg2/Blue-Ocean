@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Ocean Monitoring</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('https://source.unsplash.com/1600x900/?ocean') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .logo {
+            height: 60px;
+            margin-top: 10px;
+        }
+        .gauge {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+        }
+
+        /* Estilo para el botón del índice */
+        .index-button {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        /* Estilo para el banner lateral */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 99;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+   
+    <!-- Banner lateral -->
+    <div id="sidebar" class="sidebar">
+        <a href="#start">Start</a>
+        <a href="#about">About us</a>
+        <a href="#contact">Contact us</a>
+    </div>
+    <nav class="navbar">
+         <!-- Botón del índice -->
+        <button id="indexButton" class="index-button">&#9776; Blue Ocean</button>
+        <div class="container">
+            <img src="/assets/logo.png" alt="Blue Ocean Logo" class="mx-auto d-block logo">
+            
+        </div>
+        
+    </nav>
+    <div class="container text-center">
+        <h1 class="my-4">Real-Time Monitoring</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <canvas id="phGauge" class="gauge"></canvas>
+                <h2>pH</h2>
+            </div>
+            <div class="col-md-4">
+                <canvas id="turbidityGauge" class="gauge"></canvas>
+                <h2>Turbidity</h2>
+            </div>
+            <div class="col-md-4">
+                <canvas id="tdsGauge" class="gauge"></canvas>
+                <h2>TDS</h2>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const phGaugeCtx = document.getElementById('phGauge').getContext('2d');
+        const turbidityGaugeCtx = document.getElementById('turbidityGauge').getContext('2d');
+        const tdsGaugeCtx = document.getElementById('tdsGauge').getContext('2d');
+    
+        // Escala de colores para el pH
+        const phColors = [
+            '#f44336', '#ff5722', '#ff9800', '#ffeb3b', 
+            '#cddc39', '#8bc34a', '#4caf50', '#81c784', 
+            '#4db6ac', '#4fc3f7', '#2196f3', '#3f51b5', 
+            '#673ab7', '#9c27b0'
+        ];
+    
+        // Configuración inicial de los velocímetros
+        const phGauge = new Chart(phGaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [7, 7], // Inicialmente neutro
+                    backgroundColor: phColors
+                }]
+            },
+            options: {
+                circumference: Math.PI,
+                rotation: -Math.PI,
+                cutout: '80%'
+            }
+        });
+    
+        const turbidityGauge = new Chart(turbidityGaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [50, 50], // Valor inicial
+                    backgroundColor: ['green', 'red']
+                }]
+            },
+            options: {
+                circumference: Math.PI,
+                rotation: -Math.PI,
+                cutout: '80%'
+            }
+        });
+    
+        const tdsGauge = new Chart(tdsGaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [250, 250], // Valor inicial
+                    backgroundColor: ['green', 'red']
+                }]
+            },
+            options: {
+                circumference: Math.PI,
+                rotation: -Math.PI,
+                cutout: '80%'
+            }
+        });
+    
+        function fetchData() {
+            axios.get('http://localhost:5050/lecturas')
+                .then(response => {
+                    const data = response.data.data[0]; // Último registro
+                    updateGauges(data);
+                })
+                .catch(error => console.error(error));
+        }
+    
+        function updateGauges(data) {
+            // Actualizar el velocímetro de pH
+            phGauge.data.datasets[0].data = [data.ValorPH, 14 - data.ValorPH];
+            phGauge.update();
+    
+            // Actualizar el velocímetro de turbidez
+            turbidityGauge.data.datasets[0].data = [data.ValorTurbidez, 100 - data.ValorTurbidez];
+            turbidityGauge.update();
+    
+            // Actualizar el velocímetro de TDS
+            tdsGauge.data.datasets[0].data = [data.ValorTDS, 500 - data.ValorTDS];
+            tdsGauge.update();
+        }
+    
+        setInterval(fetchData, 2000); // Actualizar cada 2 segundos
+
+        document.getElementById('indexButton').addEventListener('click', function() {
+            document.getElementById('sidebar').style.width = '250px';
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.matches('#indexButton')) {
+                var sidebar = document.getElementById('sidebar');
+                if (sidebar.style.width === '250px') {
+                    sidebar.style.width = '0';
+                }
+            } 
+});
+    </script>
+    
+</body>
+</html>
